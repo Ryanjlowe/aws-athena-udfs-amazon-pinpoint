@@ -1,7 +1,5 @@
 package com.amazonaws.pinpoint.athena.udfs;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +28,13 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
     private static final String SOURCE_TYPE = "pinpoint_athena_udfs";
     private AmazonPinpoint pinpointClient;
     private String pinpointProjectId;
-
-	
+    
 	public PinpointAthenaUDFHandler() {
 		super(SOURCE_TYPE);
 		this.pinpointProjectId = System.getenv("PINPOINT_PROJECT_ID");
 	}
 	
-	private ClientConfiguration createClientConfiguration()
-    {
+	private ClientConfiguration createClientConfiguration() {
         int retryBaseDelay = 1000;
         int retryMaxBackoffTime = 600000;
         int maxRetries = 100;
@@ -51,7 +47,6 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
                                                     .withRetryPolicy(retryPolicy);
         return clientConfiguration;
     }
-	
 	
 	private AmazonPinpoint getPinpointClient() {
 		// create client first time on demand
@@ -74,16 +69,13 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
 		try {
 			
 			System.out.println("Got EndpointID: " + endpointId);
-						
-			GetEndpointRequest request = new GetEndpointRequest();
-			request.setApplicationId(this.pinpointProjectId);
-			request.setEndpointId(endpointId);
 			
-			GetEndpointResult response = getPinpointClient().getEndpoint(request);
+			GetEndpointResult response = getPinpointClient().getEndpoint(
+					new GetEndpointRequest()
+						.withApplicationId(this.pinpointProjectId)
+						.withEndpointId(endpointId));
 			
-			Gson gson = new Gson();			
-			
-			String endpoint = gson.toJson(response.getEndpointResponse());
+			String endpoint = new Gson().toJson(response.getEndpointResponse());
 			
 			System.out.println(endpoint);
 			
@@ -137,7 +129,6 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
 		
 	}
 	
-	
 	public Map<String, List<String>> endpoint_attributes(String endpointId) {
 		
 		try {
@@ -169,9 +160,7 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
 	
 	public String get_campaign(String campaignId) {
 		try {
-			
-			Gson gson = new Gson();
-			
+						
 			System.out.println("Got CampaignID: " + campaignId);
 			
 			GetCampaignRequest request = new GetCampaignRequest();
@@ -180,7 +169,7 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
 			
 			GetCampaignResult response = getPinpointClient().getCampaign(request);
 			
-			String campaign = gson.toJson(response.getCampaignResponse());
+			String campaign = new Gson().toJson(response.getCampaignResponse());
 			
 			System.out.println(campaign);
 			
@@ -200,11 +189,10 @@ public class PinpointAthenaUDFHandler extends UserDefinedFunctionHandler {
 			
 			System.out.println("Got CampaignID: " + campaignId);
 			
-			GetCampaignRequest request = new GetCampaignRequest();
-			request.setApplicationId(this.pinpointProjectId);
-			request.setCampaignId(campaignId);
-			
-			GetCampaignResult response = getPinpointClient().getCampaign(request);
+			GetCampaignResult response = getPinpointClient().getCampaign(
+					new GetCampaignRequest()
+						.withApplicationId(this.pinpointProjectId)
+						.withCampaignId(campaignId));
 			
 			CampaignResponse campaign = response.getCampaignResponse();
 			
